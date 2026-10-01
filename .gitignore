@@ -215,4 +215,9 @@ marimo/_lsp/
 __marimo__/
 
 # Streamlit
-.streamlit/secrets.toml
+.streamlit/secrets.tom
+
+# 82 Boxes project
+data/raw/
+data/processed/
+*.csv
