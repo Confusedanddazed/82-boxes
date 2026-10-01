@@ -38,6 +38,6 @@ The platform will use Python, SQL, a relational database, cloud services, and bu
 
 ## Project Status
 
-🚧 In development
+In development
 
 Current phase: Database and data architecture design.
