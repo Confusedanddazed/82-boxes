@@ -1,4 +1,4 @@
-# 82 Boxes
+# 82 boxes
 
 82 Boxes is an interactive NBA analytics project designed to visualize
 an NBA season through a grid of color-coded boxes.
@@ -15,15 +15,14 @@ The goal of 82 Boxes is to track how NBA teams and players perform throughout an
 
 ## Planned Features
 
-- Live NBA standings organized by conference
-- Season-specific team rosters, coaches, and statistics
-- Historical season filtering
+- Historical NBA season filtering
+- Season-specific team rosters and statistics
+- Team standings and season performance
 - 82-game team performance visualization based on point differential
 - 82-game player performance visualization based on league-wide Game Score percentiles
 - Game-by-game team and player statistics
 - Individual game shot charts
 - Interactive team and player pages
-- Automated data updates during the current NBA season
   
 ## Planned Technology Stack
 
@@ -31,10 +30,9 @@ The goal of 82 Boxes is to track how NBA teams and players perform throughout an
 - PostgreSQL
 - SQL
 - Power BI
-- Azure
 - NBA data API
 
-The platform will use Python, SQL, a relational database, cloud services, and business intelligence tools to collect, store, analyze, and visualize the data.
+The project will use Python to collect and prepare historical NBA data, PostgreSQL and SQL to store and analyze the data, and Power BI to build the interactive dashboards. 
 
 ## Project Status
 
