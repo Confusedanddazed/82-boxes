@@ -6,7 +6,7 @@ nba_teams = teams.get_teams()
 print(f"Teams found: {len(nba_teams)}")
 print(nba_teams[0])
 
-# Part 2: live API call (checks we can actually reach the NBA)
+# Part 2: live API call 
 lakers_id = 1610612747
 finder = leaguegamefinder.LeagueGameFinder(
     team_id_nullable=lakers_id,
@@ -18,3 +18,6 @@ games = finder.get_data_frames()[0]
 
 print(f"\nGames returned: {len(games)}")
 print(games[["GAME_DATE", "MATCHUP", "WL", "PTS"]].head())
+
+# Returned accurate matchup details for the last five games of the season.
+# Manually checked with ESPN stats. 
