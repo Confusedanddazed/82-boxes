@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.tom
 
 # 82 Boxes project
-data/raw/
-data/processed/
+data/
+logs/
 *.csv
+.venv

@@ -68,19 +68,19 @@ A league-wide `ShotChartDetail` request is capped at 102,400 rows, so `extract_d
 [PASS] each player id has one name
 [PASS] 26,651 player-game rows  (got 26651)
 [PASS] (game_id, player_id) is unique
-[PASS] every game_id exists in games
-[PASS] every player_id exists in players
-[PASS] every team_id exists in teams
+[PASS] player_game_stats: every game_id exists in games
+[PASS] player_game_stats: every player_id exists in players
+[PASS] player_game_stats: every team_id exists in teams
 [PASS] each player's team played in that game
 [PASS] points = 2*FGM + 3PM + FTM
 [PASS] player sums match the team log except the 3 known differences  (found {('0022500243', 1610612755, 'DREB'): -1, ('0022500792', 1610612745, 'FGA'): 1, ('0022500792', 1610612766, 'BLK'): 1})
 [PASS] (game_id, game_event_id) is unique
 [PASS] shot count equals total FGA in the player log  (219160 vs 219160)
-[PASS] every game_id exists in games
-[PASS] every player_id exists in players
-[PASS] every team_id exists in teams
+[PASS] shots: every game_id exists in games
+[PASS] shots: every player_id exists in players
+[PASS] shots: every team_id exists in teams
 
-All 24 checks passed at 2026-10-05 21:12. teams=30, games=1230, players=582, player_game_stats=26651, shots=219160
+All 24 checks passed at 2026-10-05 21:28. teams=30, games=1230, players=582, player_game_stats=26651, shots=219160
 ```
 
 ## ESPN verification
