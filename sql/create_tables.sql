@@ -4,6 +4,7 @@
 
 -- Wipes the tables if they already exist, so this file can be rerun from scratch.
 -- (Careful: once data is loaded, running this deletes it.)
+DROP VIEW IF EXISTS team_player_season_stats, team_standings, player_game_scores, team_games, game_scores, team_game_stats;
 DROP TABLE IF EXISTS shots, player_game_stats, games, players, teams;
 
 CREATE TABLE teams (
@@ -11,7 +12,8 @@ CREATE TABLE teams (
     full_name     VARCHAR(100) NOT NULL,
     abbreviation  VARCHAR(5)   NOT NULL UNIQUE,
     city          VARCHAR(100) NOT NULL,
-    nickname      VARCHAR(100) NOT NULL
+    nickname      VARCHAR(100) NOT NULL,
+    conference VARCHAR(4) NOT NULL CHECK (conference IN ('East', 'West'))
 );
 
 CREATE TABLE players (

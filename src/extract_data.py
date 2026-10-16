@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 import pandas as pd
-from nba_api.stats.endpoints import leaguegamefinder, playergamelogs, shotchartdetail
+from nba_api.stats.endpoints import leaguegamefinder, playergamelogs, shotchartdetail, leaguestandingsv3
 
 SEASON = "2025-26"
 SEASON_TYPE = "Regular Season"
@@ -25,12 +25,13 @@ team_log = leaguegamefinder.LeagueGameFinder(
     season_type_nullable=SEASON_TYPE,
     timeout=60,
 ).get_data_frames()[0]
-print("team_log:", team_log.shape) # expect 2460(82 games x 30 teams)
+print("team_log:", team_log.shape) # expect 2460 (82 games x 30 teams)
 
 # Verify the team log is complete: all 30 teams, 82 games each
 assert team_log["TEAM_ID"].nunique() == 30, "Team log is missing teams"
 assert team_log.groupby("TEAM_ID").size().eq(82).all(), "A team doesn't have 82 games"
 print("team_log OK: 30 teams x 82 games")
+
 
 # 2. Player game log: one row per player per game they appeared in
 player_log = playergamelogs.PlayerGameLogs(
@@ -45,9 +46,18 @@ assert not player_log.duplicated(["GAME_ID", "PLAYER_ID"]).any(), "Duplicate pla
 assert player_log["GAME_ID"].nunique() == 1230, "Player log is missing games"
 print("player_log OK: 1,230 games, no duplicate player-game rows")
 
-# 3. Shot chart: one call per team, since a single league-wide call is capped
+# 3. Standings: one row per team, with its conference and final win-loss record
+standings = leaguestandingsv3.LeagueStandingsV3(
+    season=SEASON,
+    season_type=SEASON_TYPE,
+    timeout=60,
+).get_data_frames()[0]
+print("standings:", standings.shape)  # expect 30 rows
+assert standings["TeamID"].nunique() == 30, "Standings is missing teams"
+
+# 4. Shot chart: one call per team, since a single league-wide call is capped
 #    at 102,400. Loop through each team ID, collect each team's shots in all_shot_charts 
-#    and cancat them into one table. 
+#    and concat them into one table. 
 all_shot_charts = []
 for team_id in team_log["TEAM_ID"].unique():
     shots_for_team = shotchartdetail.ShotChartDetail(
@@ -74,7 +84,8 @@ assert games_collected == 1230, "Missing games in the shot chart"
 
 
 # Save raw as Parquet (keeps column types, so GAME_ID keeps its leading zeros).
-team_log.to_parquet(RAW_DIR / "team_log.parquet")
-player_log.to_parquet(RAW_DIR / "player_log.parquet")
-shot_chart.to_parquet(RAW_DIR / "shot_chart.parquet")
-print("Saved 3 files to", RAW_DIR)
+team_log.to_parquet(RAW_DIR / "team_log.parquet", index=False)
+player_log.to_parquet(RAW_DIR / "player_log.parquet", index=False)
+shot_chart.to_parquet(RAW_DIR / "shot_chart.parquet", index=False)
+standings.to_parquet(RAW_DIR / "standings.parquet", index=False)
+print("Saved 4 files to", RAW_DIR)

@@ -16,6 +16,7 @@ erDiagram
     string abbreviation
     string city
     string nickname
+    string conference
   }
   PLAYERS {
     int player_id PK

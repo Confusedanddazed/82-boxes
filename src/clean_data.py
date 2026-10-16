@@ -56,6 +56,7 @@ def check(name, condition, detail=""):
 team_log = pd.read_parquet(RAW / "team_log.parquet")
 player_log = pd.read_parquet(RAW / "player_log.parquet")
 shot_chart = pd.read_parquet(RAW / "shot_chart.parquet")
+standings = pd.read_parquet(RAW / "standings.parquet")
 
 # ---------- Raw input checks ----------
 # The columns I'm keeping from each file. Picking a column that doesn't exist gives an error on its own.
@@ -79,6 +80,14 @@ teams = (pd.DataFrame(static_teams.get_teams())
          .rename(columns={"id": "team_id"})
          [["team_id", "full_name", "abbreviation", "city", "nickname"]])
 check("30 teams", len(teams) == N_TEAMS)
+
+# Conference comes from the API's standings, matched on team id
+conference_of = dict(zip(standings["TeamID"], standings["Conference"]))
+teams["conference"] = teams["team_id"].map(conference_of)
+check("every team has a conference", teams["conference"].notna().all())
+check("15 teams each in the East and West",
+      set(teams["conference"]) == {"East", "West"} and teams["conference"].value_counts().eq(15).all())
+
 # dictionary to look up a team id from its abbreviation, like {"BKN": 1610612751, ...}
 abbr_to_id = dict(zip(teams["abbreviation"], teams["team_id"]))
 
