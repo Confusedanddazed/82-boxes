@@ -6,7 +6,7 @@ head 2 head is an end-to-end interactive NBA dashboard that compares two players
 
 ### Dylan Harper vs VJ Edgecombe
 
-![Dylan Harper vs VJ Edgecombe](assets/harper_vs_edgecombe.jpg)
+![Dylan Harper vs VJ Edgecombe](assets/screenshots/harper_vs_edgecombe.jpg)
 
 I compared the second and third picks from the 2025 draft class. Since they are rookies, their heatmaps and stats usually show more volatility. At a glance, VJ appears to have had the better season. However, because he played 12 more minutes per game, his counting stats are expected to be higher. From a Game Score standpoint, VJ still has the edge: he had 13 games above the 90th percentile, while Dylan only had 4. 
 
