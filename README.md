@@ -1,6 +1,6 @@
 # head 2 head
 
-head 2 head is an end-to-end interactive NBA dashboard that compares two players across the 2025-26 season.
+head 2 head is an end-to-end interactive NBA dashboard that allows users to choose two players to compare across the 2025-26 season.
 
 ## Examples
 
