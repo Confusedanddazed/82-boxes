@@ -215,10 +215,10 @@ marimo/_lsp/
 __marimo__/
 
 # Streamlit
-.streamlit/secrets.tom
+.streamlit/secrets.toml
 
 # 82 Boxes project
 data/
 logs/
 *.csv
-.venv
+

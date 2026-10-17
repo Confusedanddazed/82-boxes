@@ -1,60 +1,79 @@
 """
 load_to_postgres.py
-Loads the five tables in data/processed/ into the boxes82 PostgreSQL database.
+Loads the cleaned data files into the boxes82 PostgreSQL database.
 Run it after sql/create_tables.sql has created the empty tables.
-
+ 
 Run from the project root:  python src/load_to_postgres.py
 """
 import os
 from pathlib import Path
-
+ 
 import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import URL
-
+ 
+# Folders
 ROOT = Path(__file__).resolve().parent.parent
 PROCESSED = ROOT / "data" / "processed"
-
-# Read the database settings from the .env file, so the password is never written in the code
+ 
+# 1. Read the database settings from the .env file.
+#    The password lives in .env so it is never written in the code or put on GitHub.
 load_dotenv(ROOT / ".env")
-names = ["DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD"]
-settings = {name: os.getenv(name) for name in names}  # a dictionary like {"DB_HOST": "localhost", ...}
-missing = [name for name, value in settings.items() if not value]
-if missing:
-    raise SystemExit(f"Missing from .env: {missing}")
-
-# URL.create builds the connection address safely, even if the password has symbols in it
+host = os.getenv("DB_HOST")
+port = os.getenv("DB_PORT")
+name = os.getenv("DB_NAME")
+user = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
+ 
+if not all([host, port, name, user, password]):
+    raise SystemExit("Something is missing in .env. Check all five DB_ settings.")
+ 
+# 2. Connect to the database.
+#    URL.create builds the address for us, even if the password has symbols in it.
 url = URL.create(
     "postgresql+psycopg2",
-    username=settings["DB_USER"],
-    password=settings["DB_PASSWORD"],
-    host=settings["DB_HOST"],
-    port=int(settings["DB_PORT"]),
-    database=settings["DB_NAME"],
+    username=user,
+    password=password,
+    host=host,
+    port=int(port),
+    database=name,
 )
 engine = create_engine(url)
-
-# Load order matters: tables that other tables point to (teams, players, games) go first
-TABLES = ["teams", "players", "games", "player_game_stats", "shots"]
-data = {name: pd.read_parquet(PROCESSED / f"{name}.parquet") for name in TABLES}
-
-# engine.begin() starts one transaction: nothing is saved unless the whole block finishes,
-# so a failure halfway through leaves the database empty instead of half loaded
+ 
+# 3. Read the cleaned files into memory.
+# The order matters: teams, players and games go first because the other tables refer to them.
+tables = ["teams", "players", "games", "player_game_stats", "shots"]
+data = {}
+for table in tables:
+    data[table] = pd.read_parquet(PROCESSED / f"{table}.parquet")
+ 
+# 4. Load everything inside one "transaction".
+#    A transaction means all-or-nothing: if anything fails, every change is undone,
+#    so the database is never left half loaded.
 with engine.begin() as conn:
-    # Empty the tables first so running this twice doesn't double the data
+ 
+    # Empty the tables first so running this script twice doesn't double the data.
     conn.execute(text("TRUNCATE shots, player_game_stats, games, players, teams"))
-
-    for name in TABLES:
-        # if_exists="append" adds rows to the table I already made in create_tables.sql
-        # index=False so pandas doesn't try to add its own index column
-        # chunksize=2000 sends the rows in batches (PostgreSQL limits how many values one statement can hold)
-        data[name].to_sql(name, conn, if_exists="append", index=False, method="multi", chunksize=2000)
-        print(f"loaded {name}: {len(data[name]):,} rows")
-
-    # Count what is now in the database and compare with the files. If any count is
-    # different, the assert fails and everything above is undone.
-    for name in TABLES:
-        in_db = conn.execute(text(f"SELECT COUNT(*) FROM {name}")).scalar()
-        assert in_db == len(data[name]), f"{name}: {in_db} in database vs {len(data[name])} in file"
-        print(f"[PASS] {name}: {in_db:,} rows in database match the file")
+ 
+    # Add each file's rows to the table made by create_tables.sql.
+    for table in tables:
+        data[table].to_sql(
+            table,
+            conn,
+            if_exists="append",
+            index=False,           
+            method="multi",        # insert many rows per command (faster)
+            chunksize=2000,        # 2000 rows being sent at a time
+        )
+        print(f"loaded {table}: {len(data[table]):,} rows")
+ 
+    # 5. Check: count the rows now in the database and compare with the files.
+    #    If a count is different, we stop here and the whole load is undone.
+    for table in tables:
+        rows_in_db = conn.execute(text(f"SELECT COUNT(*) FROM {table}")).scalar()
+        rows_in_file = len(data[table])
+        if rows_in_db != rows_in_file:
+            raise SystemExit(f"{table}: {rows_in_db} rows in database, {rows_in_file} in file")
+        print(f"[PASS] {table}: {rows_in_db:,} rows match the file")
+ 

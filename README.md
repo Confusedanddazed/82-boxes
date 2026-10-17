@@ -1,41 +1,49 @@
-# 82 boxes
+# head 2 head
 
-82 Boxes is an interactive NBA analytics project designed to visualize
-an NBA season through a grid of color-coded boxes.
+head 2 head is an end-to-end interactive NBA dashboard that compares two players across the 2025-26 season.
 
-Each box represents one regular-season game. 
-Team boxes are colored by point differential, 
-with darker green representing larger wins and lighter red representing close losses. 
-Player boxes are colored by league-wide Game Score percentile, 
-where darker green represents stronger performances and lighter red represents performances just below the league median.
+## Examples
 
-## Project Goal
+### Dylan Harper vs VJ Edgecombe
 
-The goal of 82 Boxes is to track how NBA teams and players perform throughout an entire regular season, one game at a time. Users will be able to switch between seasons, view the roster from that year, and follow how both team results and individual player performances change over the course of the season. The project will also update as the current season goes on, while still allowing users to look back at previous years.
+![Dylan Harper vs VJ Edgecombe](assets/harper_vs_edgecombe.jpg)
 
-## Planned Features
+I compared the second and third picks from the 2025 draft class. Since they are rookies, their heatmaps and stats usually show more volatility. At a glance, VJ appears to have had the better season. However, because he played 12 more minutes per game, his counting stats are expected to be higher. From a Game Score standpoint, VJ still has the edge: he had 13 games above the 90th percentile, while Dylan only had 4. 
 
-- Historical NBA season filtering
-- Season-specific team rosters and statistics
-- Team standings and season performance
-- 82-game team performance visualization based on point differential
-- 82-game player performance visualization based on league-wide Game Score percentiles
-- Game-by-game team and player statistics
-- Individual game shot charts
-- Interactive team and player pages
-  
-## Planned Technology Stack
+## Features
 
+- Python script that pulls the 2025-26 season from the NBA API, with credentials kept in a `.env` file 
+- 26 automatic data checks before anything is saved, plus manual comparison against ESPN 
+- Five-table PostgreSQL database, loaded in one all-or-nothing step with row counts checked against the source files (schema in docs/erd)
+- SQL views (CTEs, joins and window functions) that calculate team scores, standings, Game Score and its percentile
+- Two player slicers that update every visual, with player cards, delta arrows and league ranks
+- 82-game heatmaps based on league-wide Game Score percentiles
+- Shot charts of every field goal attempt, drawn on the home team's court
+- 10-game rolling average for any stat chosen in the stat picker
+
+## Technologies
+
+- NBA data API (`nba_api`)
 - Python
 - PostgreSQL
 - SQL
-- Power BI
-- NBA data API
+- PowerBI (DAX, Deneb, JSON)
 
-The project will use Python to collect and prepare historical NBA data, PostgreSQL and SQL to store and analyze the data, and Power BI to build the interactive dashboards. 
+## Instructions to run
 
-## Project Status
+You need Python 3.10+, PostgreSQL and Power BI Desktop.
 
-In development
+1. Download or clone this repository.
+2. Create an empty PostgreSQL database named boxes82.
+3. Install the packages: pip install nba_api pandas pyarrow SQLAlchemy psycopg2-binary python-dotenv
+4. Copy .env.example to .env and fill in your database settings.
+5. Run the scripts in order:
+        python src/extract_data.py
+        python src/clean_data.py
+        psql -d boxes82 -f sql/create_tables.sql
+        python src/load_to_postgres.py
+        psql -d boxes82 -f sql/views.sql
+6. Open powerbi/head2head.pbix, point its data source at your database and click Refresh.
 
-Current phase: Database and data architecture design.
+
+

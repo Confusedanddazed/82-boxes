@@ -4,9 +4,9 @@ Season: 2025-26 regular season. Source: `nba_api`.
 
 ## Early checks
 
-`test_nba_api.py` confirmed that the API is reachable and returns the expected data: 30 teams and all 82 Lakers games, five of which were checked against ESPN.
+An early API test confirmed that the API is reachable and returns the expected data: 30 teams and all 82 Lakers games, five of which were checked against ESPN.
 
-`explore_columns.py` reviewed the columns in the team and player game logs. The team log has 28 columns. The player log has 26,651 rows and 72 columns, about half of which are not needed. `GAME_ID` has leading zeros, so it is stored as text. `MIN` is a decimal and is stored as `NUMERIC(6,2)`. `MIN_SEC` contains a rounding error (`31:60`) and is not used. No missing values were found in the columns checked.
+`explore.ipynb` reviewed the columns in the team and player game logs. The team log has 28 columns. The player log has 26,651 rows and 72 columns, about half of which are not needed. `GAME_ID` has leading zeros, so it is stored as text. `MIN` is a decimal and is stored as `NUMERIC(6,2)`. `MIN_SEC` contains a rounding error (`31:60`) and is not used. No missing values were found in the columns checked.
 
 ## Home, away and neutral-site games
 
@@ -60,6 +60,8 @@ A league-wide `ShotChartDetail` request is capped at 102,400 rows, so `extract_d
 [PASS] shot_chart has no missing values
 [PASS] every game appears exactly twice
 [PASS] 30 teams
+[PASS] every team has a conference
+[PASS] 15 teams each in the East and West
 [PASS] 1,230 games  (got 1230)
 [PASS] each game has exactly one HTM in the shot data
 [PASS] home team matches the shot data HTM in all games
@@ -80,7 +82,8 @@ A league-wide `ShotChartDetail` request is capped at 102,400 rows, so `extract_d
 [PASS] shots: every player_id exists in players
 [PASS] shots: every team_id exists in teams
 
-All 24 checks passed at 2026-10-05 21:28. teams=30, games=1230, players=582, player_game_stats=26651, shots=219160
+
+ All 26 checks passed at 2026-10-07 14:12. teams=30, games=1230, players=582, player_game_stats=26651, shots=219160
 ```
 
 ## ESPN verification
@@ -138,6 +141,3 @@ All 23 player lines and both team total rows match the [ESPN box score](https://
 
 Four Brooklyn players are listed on ESPN as did not play (Claxton, Sharpe, Agbaji and Traore). They have no rows in the player log, so they are shown as "not listed in box score" in the heatmaps.
 
-## Next step
-
-Set up PostgreSQL, create the tables from the ER diagram, and load the five processed tables.

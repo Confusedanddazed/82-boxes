@@ -1,10 +1,11 @@
 -- create_tables.sql
--- Creates the five tables for 82 Boxes. Run it in the boxes82 database.
+-- Creates the five tables for head2head. Run it in the boxes82 database.
 -- Tables are created parents first (teams, players, games), then the tables that point to them.
 
 -- Wipes the tables if they already exist, so this file can be rerun from scratch.
 -- (Careful: once data is loaded, running this deletes it.)
-DROP VIEW IF EXISTS team_player_season_stats, team_standings, player_game_scores, team_games, game_scores, team_game_stats;
+DROP VIEW IF EXISTS shot_events, player_games, team_standings,
+                       player_game_scores, team_games, player_dim;
 DROP TABLE IF EXISTS shots, player_game_stats, games, players, teams;
 
 CREATE TABLE teams (
